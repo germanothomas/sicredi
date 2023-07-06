@@ -5,16 +5,16 @@ import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.repository.PautaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PautaServiceTest {
@@ -72,5 +72,68 @@ class PautaServiceTest {
 
         // then
         assertNull(result);
+    }
+
+    @Test
+    void abreSessaoVotacao() {
+        // given
+        Long pautaId = 23452352L;
+        Integer duracaoMinutosEsperada = 15;
+        Pauta pauta = new Pauta();
+
+        when(pautaRepository.findById(pautaId)).thenReturn(Optional.of(pauta));
+
+        // when
+        service.abreSessaoVotacao(pautaId, duracaoMinutosEsperada);
+
+        // then
+        ArgumentCaptor<Pauta> pautaArgumentCaptor = ArgumentCaptor.forClass(Pauta.class);
+        verify(pautaRepository).save(pautaArgumentCaptor.capture());
+
+        Pauta pautaPersistida = pautaArgumentCaptor.getValue();
+        assertEquals(pauta, pautaPersistida);
+
+        long duracaoMinutosPersistida = MINUTES.between(pautaPersistida.getSessaoVotacaoInicio(), pautaPersistida.getSessaoVotacaoFim());
+        assertEquals(duracaoMinutosEsperada, (int) duracaoMinutosPersistida);
+    }
+
+    @Test
+    void abreSessaoVotacaoDuracaoDefault() {
+        // given
+        Integer duracaoMinutosEsperada = 6;
+        service.duracaoMinutosDefault = duracaoMinutosEsperada;
+        Long pautaId = 23452352L;
+        Pauta pauta = new Pauta();
+
+        when(pautaRepository.findById(pautaId)).thenReturn(Optional.of(pauta));
+
+        // when
+        service.abreSessaoVotacao(pautaId, null);
+
+        // then
+        ArgumentCaptor<Pauta> pautaArgumentCaptor = ArgumentCaptor.forClass(Pauta.class);
+        verify(pautaRepository).save(pautaArgumentCaptor.capture());
+
+        Pauta pautaPersistida = pautaArgumentCaptor.getValue();
+        assertEquals(pauta, pautaPersistida);
+
+        long duracaoMinutosPersistida = MINUTES.between(pautaPersistida.getSessaoVotacaoInicio(), pautaPersistida.getSessaoVotacaoFim());
+        assertEquals(duracaoMinutosEsperada, (int) duracaoMinutosPersistida);
+    }
+
+    @Test
+    void abreSessaoVotacaoPautaNaoEncontrada() {
+        // given
+        Integer duracaoMinutos = 15;
+        Long pautaId = 23452352L;
+
+        when(pautaRepository.findById(pautaId)).thenReturn(Optional.empty());
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.abreSessaoVotacao(pautaId, duracaoMinutos));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains(pautaId.toString()));
     }
 }
