@@ -38,7 +38,7 @@ public class EnqueteController {
             responses = @ApiResponse(description = "id da nova pauta")
     )
     @PostMapping("/pauta")
-    public Long cadastraPauta(@RequestBody Pauta pauta) {
+    public Long cadastraPauta(@RequestBody @Valid Pauta pauta) {
         return pautaService.cadastraPauta(pauta);
     }
 
