@@ -3,6 +3,7 @@ package germano.thomas.sicredienqueteservidor.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class Item {
         private Pauta pauta;
 
         private TipoItem tipo;
+        @NotNull(message = "titulo do item é obrigatório")
         private String titulo;
         private String valor;
 
