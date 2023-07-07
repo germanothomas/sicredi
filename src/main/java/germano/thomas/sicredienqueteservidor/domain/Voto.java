@@ -2,6 +2,7 @@ package germano.thomas.sicredienqueteservidor.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,5 +30,6 @@ public class Voto {
         @JoinColumn(name="idItem", nullable=false)
         private Item item;
 
+        @JsonProperty("valor")
         private Boolean valor;
 }

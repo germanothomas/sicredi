@@ -1,6 +1,7 @@
 package germano.thomas.sicredienqueteservidor.controller;
 
 import germano.thomas.sicredienqueteservidor.controller.bean.AbreSessaoVotacaoBean;
+import germano.thomas.sicredienqueteservidor.controller.bean.ContabilizaResultadoBean;
 import germano.thomas.sicredienqueteservidor.controller.bean.VotaBean;
 import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.service.PautaService;
@@ -61,12 +62,22 @@ public class EnqueteController {
     }
 
     @Operation(summary = "Vota",
-            description = "Receber votos dos associados em pautas<br>",
+            description = "Receber votos dos associados em pautas.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Os votos sao apenas 'Sim'/'Nao'.<br>" +
                     "Cada associado e identificado por um id unico e pode votar apenas uma vez por pauta.")
     )
     @PostMapping("/sessao-votacao/vota")
     public Long vota(@RequestBody @Valid VotaBean votaBean) {
         return votoService.vota(votaBean.idAssociado(), votaBean.idItem(), votaBean.valor());
+    }
+
+    @Operation(summary = "Contabiliza resultado",
+            description = "Contabilizar os votos e dar o resultado da votacao na pauta.",
+            responses = @ApiResponse(description = "Votos contabilizados")
+    )
+    @GetMapping("/pauta/resultado/{idItem}")
+    public ContabilizaResultadoBean contabilizaResultado(
+            @Parameter(description = "id do item a ter seus votos contabilizados.", required = true) @PathVariable Long idItem) {
+        return votoService.contabilizaResultado(idItem);
     }
 }
