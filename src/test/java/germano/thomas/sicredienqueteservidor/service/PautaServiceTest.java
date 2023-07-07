@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -127,13 +128,93 @@ class PautaServiceTest {
         Integer duracaoMinutos = 15;
         Long pautaId = 23452352L;
 
-        when(pautaRepository.findById(pautaId)).thenReturn(Optional.empty());
-
         // when
         IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
                 service.abreSessaoVotacao(pautaId, duracaoMinutos));
 
         // then
-        assertTrue(excecaoEsperada.getMessage().contains(pautaId.toString()));
+        assertTrue(excecaoEsperada.getMessage().contains("encontr"));
+    }
+
+    @Test
+    void isSessaoVotacaoAtivaSim() {
+        // given
+        Pauta pauta = new Pauta();
+        pauta.setSessaoVotacaoInicio(LocalDateTime.MIN);
+        pauta.setSessaoVotacaoFim(LocalDateTime.MAX);
+
+        // when
+        boolean result = service.isSessaoVotacaoAtiva(pauta);
+
+        // then
+        assertTrue(result);
+    }
+
+    @Test
+    void isSessaoVotacaoAtivaInicioFimNulo() {
+        // given
+        Pauta pauta = new Pauta();
+
+        // when
+        boolean result = service.isSessaoVotacaoAtiva(pauta);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isSessaoVotacaoAtivaInicioNulo() {
+        // given
+        Pauta pauta = new Pauta();
+        pauta.setSessaoVotacaoFim(LocalDateTime.MAX);
+
+        // when
+        boolean result = service.isSessaoVotacaoAtiva(pauta);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isSessaoVotacaoAtivaFimNulo() {
+        // given
+        Pauta pauta = new Pauta();
+        pauta.setSessaoVotacaoInicio(LocalDateTime.MIN);
+
+        // when
+        boolean result = service.isSessaoVotacaoAtiva(pauta);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isSessaoVotacaoAtivaAntesInicio() {
+        // given
+        Pauta pauta = new Pauta();
+        LocalDateTime agora = LocalDateTime.now();
+        pauta.setSessaoVotacaoInicio(agora.minusHours(2L));
+        pauta.setSessaoVotacaoFim(agora.minusHours(1L));
+
+        // when
+        boolean result = service.isSessaoVotacaoAtiva(pauta);
+
+        // then
+        assertFalse(result);
+    }
+
+    @Test
+    void isSessaoVotacaoAtivaDepiosFim() {
+        // given
+        Pauta pauta = new Pauta();
+        LocalDateTime agora = LocalDateTime.now();
+        pauta.setSessaoVotacaoInicio(agora.plusHours(1L));
+        pauta.setSessaoVotacaoFim(agora.plusHours(2L));
+
+        // when
+        boolean result = service.isSessaoVotacaoAtiva(pauta);
+
+        // then
+        assertFalse(result);
     }
 }

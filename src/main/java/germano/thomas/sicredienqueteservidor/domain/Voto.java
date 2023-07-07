@@ -7,34 +7,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 /**
- * Item de uma {@link Pauta}.
+ * Voto de um associado para determinado {@link Item}.
  */
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(NON_NULL)
-public class Item {
+public class Voto {
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         private Long id;
 
+        private Long idAssociado;
+
         @ManyToOne
         @JsonIgnore
-        @JoinColumn(name="idPauta", nullable=false)
-        private Pauta pauta;
+        @JoinColumn(name="idItem", nullable=false)
+        private Item item;
 
-        private TipoItem tipo;
-        private String titulo;
-        private String valor;
-
-        @OneToMany(mappedBy="item", cascade=CascadeType.ALL)
-        @JsonIgnore
-        private List<Voto> votos = new ArrayList<>();
+        private Boolean valor;
 }
