@@ -7,6 +7,7 @@ Criado para avaliação técnica do Sicredi
 ###Added
 - Cadastro e carregamento de pauta
 - Abertura de sessão de votação
+- Recebimento de votos dos associados em pautas
 ###Changed
 ###Deprecated
 ###Removed
