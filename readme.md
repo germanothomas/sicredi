@@ -6,6 +6,7 @@ Criado para avaliação técnica do Sicredi
 ## [Unreleased]
 ###Added
 ###Changed
+- Endpoint de Contabilização do resultado passa a fazer a mesma coisa que o de Carrega resultado.
 ###Deprecated
 ###Removed
 ###Fixed

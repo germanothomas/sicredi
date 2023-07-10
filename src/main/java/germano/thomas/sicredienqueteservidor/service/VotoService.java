@@ -1,6 +1,5 @@
 package germano.thomas.sicredienqueteservidor.service;
 
-import germano.thomas.sicredienqueteservidor.controller.bean.ContabilizaResultadoBean;
 import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoItemBean;
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
@@ -66,23 +65,6 @@ public class VotoService {
 
     private String constroiLogVota(Long idAssociado, Long idItem, String mensagem) {
         return "vota (idAssociado=" + idAssociado + ", idItem=" + idItem + "): " + mensagem;
-    }
-
-    /**
-     * Contabilizar os votos e dar o resultado da votação na pauta.
-     * @param idItem id do item a ter seus votos contabilizados.
-     * @return Votos contabilizados.
-     * @deprecated contabilização foi quebrada em 2 etapas: {@link #contabilizaVotos(Long)} e {@link #carregaResultado(Long)}.
-     */
-    @Deprecated(since = "v1.2.0")
-    public ContabilizaResultadoBean contabilizaResultado(Long idItem) {
-        long votosPositivos = votoRepository.countVotos(idItem, Boolean.TRUE);
-        long votosNegativos = votoRepository.countVotos(idItem, Boolean.FALSE);
-
-        Long totalVotos = votosPositivos + votosNegativos;
-        Long porcentagemAprovacao = totalVotos == 0 ? 0 : 100 * votosPositivos / totalVotos;
-
-        return new ContabilizaResultadoBean(totalVotos, porcentagemAprovacao);
     }
 
     /**

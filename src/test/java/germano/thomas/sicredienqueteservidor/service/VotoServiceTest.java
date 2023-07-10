@@ -1,6 +1,5 @@
 package germano.thomas.sicredienqueteservidor.service;
 
-import germano.thomas.sicredienqueteservidor.controller.bean.ContabilizaResultadoBean;
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
@@ -117,66 +116,6 @@ class VotoServiceTest {
 
         // then
         assertTrue(excecaoEsperada.getMessage().contains("apenas uma vez"));
-    }
-
-    @Test
-    void contabilizaResultado() {
-        // given
-        Long idItem = 3076986L;
-        when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(3L);
-        when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(1L);
-
-        // when
-        ContabilizaResultadoBean result = service.contabilizaResultado(idItem);
-
-        // then
-        assertEquals(4, result.totalVotos());
-        assertEquals(75, result.porcentagemAprovacao());
-    }
-
-    @Test
-    void contabilizaResultadoSemVotos() {
-        // given
-        Long idItem = 9876345L;
-        when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(0L);
-        when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(0L);
-
-        // when
-        ContabilizaResultadoBean result = service.contabilizaResultado(idItem);
-
-        // then
-        assertEquals(0, result.totalVotos());
-        assertEquals(0, result.porcentagemAprovacao());
-    }
-
-    @Test
-    void contabilizaResultadoUnanimidadePositiva() {
-        // given
-        Long idItem = 765765L;
-        when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(3L);
-        when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(0L);
-
-        // when
-        ContabilizaResultadoBean result = service.contabilizaResultado(idItem);
-
-        // then
-        assertEquals(3, result.totalVotos());
-        assertEquals(100, result.porcentagemAprovacao());
-    }
-
-    @Test
-    void contabilizaResultadoUnanimidadeNegativa() {
-        // given
-        Long idItem = 2343465L;
-        when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(0L);
-        when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(5L);
-
-        // when
-        ContabilizaResultadoBean result = service.contabilizaResultado(idItem);
-
-        // then
-        assertEquals(5, result.totalVotos());
-        assertEquals(0, result.porcentagemAprovacao());
     }
 
     @ParameterizedTest
