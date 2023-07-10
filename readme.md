@@ -9,6 +9,7 @@ Criado para avaliação técnica do Sicredi
 - Endpoint de Contabilização do resultado passa a fazer a mesma coisa que o de Carrega resultado.
 - Endpoint de Carrega pauta pode mostrar o resultado da votação de todos os itens
 ###Deprecated
+- Endpoint GET de Contabilização de Votos. Utilizar o endpoint POST de mesmo nome.
 ###Removed
 ###Fixed
 ###Security
