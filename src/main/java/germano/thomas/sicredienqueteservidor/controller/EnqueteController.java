@@ -49,7 +49,8 @@ public class EnqueteController {
     )
     @GetMapping("/pauta/{id}")
     public Pauta carregaPauta(@Parameter(description = "id da pauta a ser carregada.", required = true) @PathVariable Long id,
-                              @Parameter(description = "define se o resultado da votacao deve ser mostrado.")
+                              @Parameter(description = "define se o resultado da votacao deve ser mostrado. " +
+                                      "Eles devem ter sido previamente contabilizados.")
                               @RequestParam(required = false) Boolean mostraResultado) {
         return pautaService.carregaPauta(id, mostraResultado);
     }

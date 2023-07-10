@@ -5,6 +5,7 @@ Criado para avaliação técnica do Sicredi
 
 ## [Unreleased]
 ###Added
+- Validação se um associado pode votar baseado no CPF.
 ###Changed
 ###Deprecated
 ###Removed

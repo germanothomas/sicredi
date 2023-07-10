@@ -5,6 +5,8 @@ import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
 import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
 import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
+import germano.thomas.sicredienqueteservidor.service.externo.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,9 +29,16 @@ class VotoServiceTest {
     ItemRepository itemRepository;
     @Mock
     PautaService pautaService;
+    @Mock
+    UserService userService;
 
     @InjectMocks
     VotoService service;
+
+    @BeforeEach
+    void setup() {
+        lenient().when(userService.podeVotar(anyLong())).thenReturn(true);
+    }
 
     @Test
     void vota() {
@@ -116,6 +125,22 @@ class VotoServiceTest {
 
         // then
         assertTrue(excecaoEsperada.getMessage().contains("apenas uma vez"));
+    }
+
+    @Test
+    void votaAssociadoNaoPodeVotar() {
+        // given
+        Long idAssociado = 87698L;
+        Long idItem = 2342L;
+        Boolean valor = Boolean.TRUE;
+        when(userService.podeVotar(idAssociado)).thenReturn(false);
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.vota(idAssociado, idItem, valor));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("pode votar"));
     }
 
     @ParameterizedTest
