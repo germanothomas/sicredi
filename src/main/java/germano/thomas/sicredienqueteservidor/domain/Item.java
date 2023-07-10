@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,4 +40,11 @@ public class Item {
         @OneToMany(mappedBy="item", cascade=CascadeType.ALL)
         @JsonIgnore
         private List<Voto> votos = new ArrayList<>();
+
+		@JsonIgnore
+        private Long totalVotos;
+		@JsonIgnore
+        private Long porcentagemAprovacao;
+		@JsonIgnore
+        private LocalDateTime dataHoraContabilizacao;
 }

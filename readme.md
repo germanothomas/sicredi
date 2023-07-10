@@ -11,6 +11,12 @@ Criado para avaliação técnica do Sicredi
 ###Fixed
 ###Security
 
+## [1.2.0] - 2023-07-10
+###Changed
+- Melhora de performance: resultado da votação passa a ser persistido no banco e não precisa ser recalculado toda vez.
+###Deprecated
+- Contabilização do resultado. No lugar deve ser utilizado: Contabiliza votos e Carrega resultado.
+
 ## [1.1.0] - 2023-07-07
 ###Added
 - Cadastro e carregamento de pauta
