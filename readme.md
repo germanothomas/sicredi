@@ -11,6 +11,13 @@ Criado para avaliação técnica do Sicredi
 ###Fixed
 ###Security
 
+## [1.3.0] - 2023-07-10
+###Changed
+- Endpoint de Contabilização do resultado passa a fazer a mesma coisa que o de Carrega resultado.
+- Endpoint de Carrega pauta pode mostrar o resultado da votação de todos os itens
+###Deprecated
+- Endpoint GET de Contabilização de Votos. Utilizar o endpoint POST de mesmo nome.
+
 ## [1.2.0] - 2023-07-10
 ###Changed
 - Melhora de performance: resultado da votação passa a ser persistido no banco e não precisa ser recalculado toda vez.

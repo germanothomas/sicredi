@@ -1,6 +1,5 @@
 package germano.thomas.sicredienqueteservidor.service;
 
-import germano.thomas.sicredienqueteservidor.controller.bean.ContabilizaResultadoBean;
 import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoItemBean;
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
@@ -36,7 +35,7 @@ public class VotoService {
     public Long vota(Long idAssociado, Long idItem, Boolean valor) {
         Optional<Item> optionalItem = itemRepository.findById(idItem);
         if (optionalItem.isEmpty()) {
-            String mensagemErro = "Item não encontrado.";
+            String mensagemErro = "Item não encontrado para votação.";
             log.warn(constroiLogVota(idAssociado, idItem, mensagemErro));
 
             throw new IllegalArgumentException(mensagemErro);
@@ -69,23 +68,6 @@ public class VotoService {
     }
 
     /**
-     * Contabilizar os votos e dar o resultado da votação na pauta.
-     * @param idItem id do item a ter seus votos contabilizados.
-     * @return Votos contabilizados.
-     * @deprecated contabilização foi quebrada em 2 etapas: {@link #contabilizaVotos(Long)} e {@link #carregaResultado(Long)}.
-     */
-    @Deprecated(since = "v1.2.0")
-    public ContabilizaResultadoBean contabilizaResultado(Long idItem) {
-        long votosPositivos = votoRepository.countVotos(idItem, Boolean.TRUE);
-        long votosNegativos = votoRepository.countVotos(idItem, Boolean.FALSE);
-
-        Long totalVotos = votosPositivos + votosNegativos;
-        Long porcentagemAprovacao = totalVotos == 0 ? 0 : 100 * votosPositivos / totalVotos;
-
-        return new ContabilizaResultadoBean(totalVotos, porcentagemAprovacao);
-    }
-
-    /**
      * Contabilizar os votos de um item em uma pauta.
      * @param idItem id do item a ter seus votos contabilizados.
      * @return Total de votos contabilizados.
@@ -93,7 +75,7 @@ public class VotoService {
     public Long contabilizaVotos(Long idItem) {
         Optional<Item> optionalItem = itemRepository.findById(idItem);
         if (optionalItem.isEmpty()) {
-            String mensagemErro = "Item não encontrado.";
+            String mensagemErro = "Item não encontrado para contabilização.";
             log.warn("contabilizaVotos (idItem=" + idItem + "): ", mensagemErro);
 
             throw new IllegalArgumentException(mensagemErro);
@@ -125,7 +107,7 @@ public class VotoService {
     public ResultadoVotacaoItemBean carregaResultado(Long idItem) {
         ResultadoVotacaoItemBean resultado = itemRepository.findResultado(idItem);
         if (resultado == null) {
-            String mensagemErro = "Item não encontrado.";
+            String mensagemErro = "Item não encontrado para carregar resultado.";
             log.warn("carregaResultado (idItem=" + idItem + "): ", mensagemErro);
 
             throw new IllegalArgumentException(mensagemErro);

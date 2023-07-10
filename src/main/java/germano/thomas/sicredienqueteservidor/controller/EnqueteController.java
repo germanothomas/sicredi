@@ -1,7 +1,6 @@
 package germano.thomas.sicredienqueteservidor.controller;
 
 import germano.thomas.sicredienqueteservidor.controller.bean.AbreSessaoVotacaoBean;
-import germano.thomas.sicredienqueteservidor.controller.bean.ContabilizaResultadoBean;
 import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoItemBean;
 import germano.thomas.sicredienqueteservidor.controller.bean.VotaBean;
 import germano.thomas.sicredienqueteservidor.domain.Pauta;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Info(
         title = "API de enquetes Sicredi",
         description = "Controla a utilizacao das enquetes: cadastro de pautas, sessoes de votacao e resultados.",
-        version = "v1.2.0"
+        version = "v1.3.0"
 )
 )
 @RequestMapping(produces = "application/json;charset=UTF-8")
@@ -49,8 +48,10 @@ public class EnqueteController {
             responses = @ApiResponse(description = "pauta carregada")
     )
     @GetMapping("/pauta/{id}")
-    public Pauta carregaPauta(@Parameter(description = "id da pauta a ser carregada.", required = true) @PathVariable Long id) {
-        return pautaService.carregaPauta(id);
+    public Pauta carregaPauta(@Parameter(description = "id da pauta a ser carregada.", required = true) @PathVariable Long id,
+                              @Parameter(description = "define se o resultado da votacao deve ser mostrado.")
+                              @RequestParam(required = false) Boolean mostraResultado) {
+        return pautaService.carregaPauta(id, mostraResultado);
     }
 
     @Operation(summary = "Abre sessao votacao",
@@ -74,23 +75,32 @@ public class EnqueteController {
     }
 
     @Operation(summary = "Contabiliza resultado",
-            description = "Contabilizar os votos e dar o resultado da votacao na pauta.<br> " +
-                    "Deprecated: Contabilizacao foi quebrada em 2 etapas: contabilizaVotos e carregaResultado.",
-            responses = @ApiResponse(description = "Votos contabilizados"),
+            description = "Sera removido na proxima versao. Faz o mesmo que o endpoint de Carrega resultado.",
             deprecated = true
     )
     @GetMapping("/pauta/resultado/{idItem}")
-    public ContabilizaResultadoBean contabilizaResultado(
+    public ResultadoVotacaoItemBean contabilizaResultado(
+            @Parameter(description = "id do item a ter o resultado carregado.", required = true) @PathVariable Long idItem) {
+        return carregaResultado(idItem);
+    }
+
+    @Operation(summary = "Contabiliza votos",
+            description = "Sera removido na proxima versao. Utilizar o endpoint POST de mesmo nome.",
+            responses = @ApiResponse(description = "Total de votos contabilizados."),
+            deprecated = true
+    )
+    @GetMapping("/item/{idItem}/contabiliza-votos")
+    public Long contabilizaVotosGet(
             @Parameter(description = "id do item a ter seus votos contabilizados.", required = true) @PathVariable Long idItem) {
-        return votoService.contabilizaResultado(idItem);
+        return votoService.contabilizaVotos(idItem);
     }
 
     @Operation(summary = "Contabiliza votos",
             description = "Contabilizar os votos de um item em uma pauta.",
             responses = @ApiResponse(description = "Total de votos contabilizados.")
     )
-    @GetMapping("/item/{idItem}/contabiliza-votos")
-    public Long contabilizaVotos(
+    @PostMapping("/item/{idItem}/contabiliza-votos")
+    public Long contabilizaVotosPost(
             @Parameter(description = "id do item a ter seus votos contabilizados.", required = true) @PathVariable Long idItem) {
         return votoService.contabilizaVotos(idItem);
     }
