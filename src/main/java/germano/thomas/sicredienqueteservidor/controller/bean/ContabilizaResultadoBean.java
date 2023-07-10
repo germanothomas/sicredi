@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Contém o resultado de um item de uma pauta.
+ * @deprecated utilizar {@link ResultadoVotacaoItemBean}.
  */
+@Deprecated(since = "v1.2.0")
 public record ContabilizaResultadoBean(
         Long totalVotos,
         @Schema(description = "Valor entre 0 e 100.")

@@ -8,6 +8,8 @@ import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
 import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,8 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class VotoServiceTest {
@@ -34,7 +35,7 @@ class VotoServiceTest {
     @Test
     void vota() {
         // given
-        Long idAssociado = 76234L;
+        Long idAssociado = 87698L;
         Long idItem = 2342L;
         Boolean valor = Boolean.TRUE;
         Item item = mock(Item.class);
@@ -63,7 +64,7 @@ class VotoServiceTest {
     @Test
     void votaItemNaoEncontrado() {
         // given
-        Long idAssociado = 76234L;
+        Long idAssociado = 6454L;
         Long idItem = 2342L;
         Boolean valor = Boolean.TRUE;
 
@@ -78,7 +79,7 @@ class VotoServiceTest {
     @Test
     void votaPautaSessaoInativa() {
         // given
-        Long idAssociado = 76234L;
+        Long idAssociado = 234L;
         Long idItem = 2342L;
         Boolean valor = Boolean.TRUE;
         Item item = mock(Item.class);
@@ -121,7 +122,7 @@ class VotoServiceTest {
     @Test
     void contabilizaResultado() {
         // given
-        Long idItem = 9876345L;
+        Long idItem = 3076986L;
         when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(3L);
         when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(1L);
 
@@ -151,7 +152,7 @@ class VotoServiceTest {
     @Test
     void contabilizaResultadoUnanimidadePositiva() {
         // given
-        Long idItem = 9876345L;
+        Long idItem = 765765L;
         when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(3L);
         when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(0L);
 
@@ -166,7 +167,7 @@ class VotoServiceTest {
     @Test
     void contabilizaResultadoUnanimidadeNegativa() {
         // given
-        Long idItem = 9876345L;
+        Long idItem = 2343465L;
         when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(0L);
         when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(5L);
 
@@ -176,5 +177,36 @@ class VotoServiceTest {
         // then
         assertEquals(5, result.totalVotos());
         assertEquals(0, result.porcentagemAprovacao());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "3, 1, 75",
+            "8, 0, 100",
+            "0, 9, 0",
+            "0, 0, 0",
+    })
+    void contabilizaVotos(Long votosSim, Long votosNao, Long porcentagemAprovacaoEsperada) {
+        // given
+        Long idItem = 252352L;
+        Long totalVotosEsperados = votosSim + votosNao;
+        Item item = new Item();
+        when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(votosSim);
+        when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(votosNao);
+        when(itemRepository.findById(idItem)).thenReturn(Optional.of(item));
+
+        // when
+        Long result = service.contabilizaVotos(idItem);
+
+        // then
+        assertEquals(totalVotosEsperados, result);
+
+        ArgumentCaptor<Item> itemArgumentCaptor = ArgumentCaptor.forClass(Item.class);
+        verify(itemRepository).save(itemArgumentCaptor.capture());
+        Item itemPersistido = itemArgumentCaptor.getValue();
+
+        assertEquals(totalVotosEsperados, itemPersistido.getTotalVotos());
+        assertEquals(porcentagemAprovacaoEsperada, itemPersistido.getPorcentagemAprovacao());
+        assertNotNull(itemPersistido.getDataHoraContabilizacao());
     }
 }
