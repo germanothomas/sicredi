@@ -48,8 +48,10 @@ public class EnqueteController {
             responses = @ApiResponse(description = "pauta carregada")
     )
     @GetMapping("/pauta/{id}")
-    public Pauta carregaPauta(@Parameter(description = "id da pauta a ser carregada.", required = true) @PathVariable Long id) {
-        return pautaService.carregaPauta(id);
+    public Pauta carregaPauta(@Parameter(description = "id da pauta a ser carregada.", required = true) @PathVariable Long id,
+                              @Parameter(description = "define se o resultado da votacao deve ser mostrado.")
+                              @RequestParam(required = false) Boolean mostraResultado) {
+        return pautaService.carregaPauta(id, mostraResultado);
     }
 
     @Operation(summary = "Abre sessao votacao",
@@ -73,7 +75,7 @@ public class EnqueteController {
     }
 
     @Operation(summary = "Contabiliza resultado",
-            description = "Será removido na próxima versão. Faz a mesma coisa que o endpoint de Carrega resultado.",
+            description = "Sera removido na proxima versao. Faz o mesmo que o endpoint de Carrega resultado.",
             deprecated = true
     )
     @GetMapping("/pauta/resultado/{idItem}")
