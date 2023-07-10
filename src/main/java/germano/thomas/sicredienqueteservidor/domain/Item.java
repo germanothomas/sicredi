@@ -41,10 +41,7 @@ public class Item {
         @JsonIgnore
         private List<Voto> votos = new ArrayList<>();
 
-		@JsonIgnore
         private Long totalVotos;
-		@JsonIgnore
         private Long porcentagemAprovacao;
-		@JsonIgnore
         private LocalDateTime dataHoraContabilizacao;
 }

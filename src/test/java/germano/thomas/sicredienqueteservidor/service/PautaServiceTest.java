@@ -50,15 +50,49 @@ class PautaServiceTest {
     void carregaPauta() {
         // given
         Long pautaId = 23452352L;
-        Pauta pautaEsperada = mock(Pauta.class);
+        Pauta pautaEsperada = new Pauta();
+        Item item = new Item();
+        item.setTotalVotos(10L);
+        item.setPorcentagemAprovacao(70L);
+        item.setDataHoraContabilizacao(LocalDateTime.now());
+        pautaEsperada.getItens().add(item);
 
         when(pautaRepository.findById(pautaId)).thenReturn(Optional.of(pautaEsperada));
 
         // when
-        Pauta result = service.carregaPauta(pautaId);
+        Pauta result = service.carregaPauta(pautaId, false);
 
         // then
         assertEquals(pautaEsperada, result);
+        assertNull(item.getTotalVotos());
+        assertNull(item.getPorcentagemAprovacao());
+        assertNull(item.getDataHoraContabilizacao());
+    }
+
+    @Test
+    void carregaPautaMostraResultado() {
+        // given
+        Long pautaId = 23452352L;
+        Pauta pautaEsperada = new Pauta();
+        Item item = new Item();
+        long totalVotosEsperado = 10L;
+        long porcentagemAprovacaoEsperada = 70L;
+        LocalDateTime dataHoraContabilizacaoEsperada = LocalDateTime.now();
+        item.setTotalVotos(totalVotosEsperado);
+        item.setPorcentagemAprovacao(porcentagemAprovacaoEsperada);
+        item.setDataHoraContabilizacao(dataHoraContabilizacaoEsperada);
+        pautaEsperada.getItens().add(item);
+
+        when(pautaRepository.findById(pautaId)).thenReturn(Optional.of(pautaEsperada));
+
+        // when
+        Pauta result = service.carregaPauta(pautaId, true);
+
+        // then
+        assertEquals(pautaEsperada, result);
+        assertEquals(totalVotosEsperado, item.getTotalVotos());
+        assertEquals(porcentagemAprovacaoEsperada, item.getPorcentagemAprovacao());
+        assertEquals(dataHoraContabilizacaoEsperada, item.getDataHoraContabilizacao());
     }
 
     @Test
@@ -69,7 +103,7 @@ class PautaServiceTest {
         when(pautaRepository.findById(pautaId)).thenReturn(Optional.empty());
 
         // when
-        Pauta result = service.carregaPauta(pautaId);
+        Pauta result = service.carregaPauta(pautaId, true);
 
         // then
         assertNull(result);

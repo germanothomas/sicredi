@@ -7,6 +7,7 @@ Criado para avaliação técnica do Sicredi
 ###Added
 ###Changed
 - Endpoint de Contabilização do resultado passa a fazer a mesma coisa que o de Carrega resultado.
+- Endpoint de Carrega pauta pode mostrar o resultado da votação de todos os itens
 ###Deprecated
 ###Removed
 ###Fixed
