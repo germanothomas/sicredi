@@ -74,33 +74,12 @@ public class EnqueteController {
         return votoService.vota(votaBean.idAssociado(), votaBean.idItem(), votaBean.valor());
     }
 
-    @Operation(summary = "Contabiliza resultado",
-            description = "Sera removido na proxima versao. Faz o mesmo que o endpoint de Carrega resultado.",
-            deprecated = true
-    )
-    @GetMapping("/pauta/resultado/{idItem}")
-    public ResultadoVotacaoItemBean contabilizaResultado(
-            @Parameter(description = "id do item a ter o resultado carregado.", required = true) @PathVariable Long idItem) {
-        return carregaResultado(idItem);
-    }
-
-    @Operation(summary = "Contabiliza votos",
-            description = "Sera removido na proxima versao. Utilizar o endpoint POST de mesmo nome.",
-            responses = @ApiResponse(description = "Total de votos contabilizados."),
-            deprecated = true
-    )
-    @GetMapping("/item/{idItem}/contabiliza-votos")
-    public Long contabilizaVotosGet(
-            @Parameter(description = "id do item a ter seus votos contabilizados.", required = true) @PathVariable Long idItem) {
-        return votoService.contabilizaVotos(idItem);
-    }
-
     @Operation(summary = "Contabiliza votos",
             description = "Contabilizar os votos de um item em uma pauta.",
             responses = @ApiResponse(description = "Total de votos contabilizados.")
     )
     @PostMapping("/item/{idItem}/contabiliza-votos")
-    public Long contabilizaVotosPost(
+    public Long contabilizaVotos(
             @Parameter(description = "id do item a ter seus votos contabilizados.", required = true) @PathVariable Long idItem) {
         return votoService.contabilizaVotos(idItem);
     }

@@ -8,6 +8,8 @@ Criado para avaliação técnica do Sicredi
 ###Changed
 ###Deprecated
 ###Removed
+- Endpoint de Contabilização do resultado. No lugar deve ser utilizado: Contabiliza votos e Carrega resultado.
+- Endpoint GET de Contabilização de Votos. Utilizar o endpoint POST de mesmo nome.
 ###Fixed
 ###Security
 
