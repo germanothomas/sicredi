@@ -5,6 +5,7 @@ import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
 import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
 import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
+import germano.thomas.sicredienqueteservidor.service.externo.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class VotoService {
     ItemRepository itemRepository;
     @Autowired
     PautaService pautaService;
+    @Autowired
+    UserService userService;
 
     /**
      * Receber votos dos associados em pautas.
@@ -33,6 +36,10 @@ public class VotoService {
      * @return id do novo voto.
      */
     public Long vota(Long idAssociado, Long idItem, Boolean valor) {
+        if (!userService.podeVotar(idAssociado)) {
+            throw new IllegalArgumentException("Associado de id " + idAssociado + " não pode votar devido a um serviço externo.");
+        }
+
         Optional<Item> optionalItem = itemRepository.findById(idItem);
         if (optionalItem.isEmpty()) {
             String mensagemErro = "Item não encontrado para votação.";

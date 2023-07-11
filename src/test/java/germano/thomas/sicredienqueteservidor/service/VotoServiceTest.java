@@ -1,10 +1,13 @@
 package germano.thomas.sicredienqueteservidor.service;
 
+import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoItemBean;
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
 import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
 import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
+import germano.thomas.sicredienqueteservidor.service.externo.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,9 +31,16 @@ class VotoServiceTest {
     ItemRepository itemRepository;
     @Mock
     PautaService pautaService;
+    @Mock
+    UserService userService;
 
     @InjectMocks
     VotoService service;
+
+    @BeforeEach
+    void setup() {
+        lenient().when(userService.podeVotar(anyLong())).thenReturn(true);
+    }
 
     @Test
     void vota() {
@@ -118,6 +129,22 @@ class VotoServiceTest {
         assertTrue(excecaoEsperada.getMessage().contains("apenas uma vez"));
     }
 
+    @Test
+    void votaAssociadoNaoPodeVotar() {
+        // given
+        Long idAssociado = 87698L;
+        Long idItem = 2342L;
+        Boolean valor = Boolean.TRUE;
+        when(userService.podeVotar(idAssociado)).thenReturn(false);
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.vota(idAssociado, idItem, valor));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("pode votar"));
+    }
+
     @ParameterizedTest
     @CsvSource({
             "3, 1, 75",
@@ -147,5 +174,47 @@ class VotoServiceTest {
         assertEquals(totalVotosEsperados, itemPersistido.getTotalVotos());
         assertEquals(porcentagemAprovacaoEsperada, itemPersistido.getPorcentagemAprovacao());
         assertNotNull(itemPersistido.getDataHoraContabilizacao());
+    }
+
+    @Test
+    void carregaResultado() {
+        // given
+        Long idItem = 238746L;
+        ResultadoVotacaoItemBean resultadoEsperado = new ResultadoVotacaoItemBean(4L, 25L, LocalDateTime.now());
+        when(itemRepository.findResultado(idItem)).thenReturn(resultadoEsperado);
+
+        // when
+        ResultadoVotacaoItemBean result = service.carregaResultado(idItem);
+
+        // then
+        assertEquals(resultadoEsperado, result);
+    }
+
+    @Test
+    void carregaResultadoItemNaoEncontrado() {
+        // given
+        Long idItem = 238746L;
+        when(itemRepository.findResultado(idItem)).thenReturn(null);
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.carregaResultado(idItem));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("encontrado"));
+    }
+
+    @Test
+    void carregaResultadoItemNaoContabilizado() {
+        // given
+        Long idItem = 238746L;
+        when(itemRepository.findResultado(idItem)).thenReturn(new ResultadoVotacaoItemBean(null, null, null));
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.carregaResultado(idItem));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("contabilizados"));
     }
 }
