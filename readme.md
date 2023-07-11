@@ -5,14 +5,18 @@ Criado para avaliação técnica do Sicredi
 
 ## [Unreleased]
 ###Added
-- Validação se um associado pode votar baseado no CPF.
 ###Changed
 ###Deprecated
 ###Removed
-- Endpoint de Contabilização do resultado. No lugar deve ser utilizado: Contabiliza votos e Carrega resultado.
-- Endpoint GET de Contabilização de Votos. Utilizar o endpoint POST de mesmo nome.
 ###Fixed
 ###Security
+
+## [2.0.0] - 2023-07-11
+###Added
+- Validação se um associado pode votar baseado no CPF.
+###Removed
+- Endpoint de Contabilização do resultado. No lugar deve ser utilizado: Contabiliza votos e Carrega resultado.
+- Endpoint GET de Contabilização de Votos. Utilizar o endpoint POST de mesmo nome.
 
 ## [1.3.0] - 2023-07-10
 ###Changed
