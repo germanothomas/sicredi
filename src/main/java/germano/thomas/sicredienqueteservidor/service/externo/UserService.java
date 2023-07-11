@@ -2,6 +2,9 @@ package germano.thomas.sicredienqueteservidor.service.externo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import germano.thomas.sicredienqueteservidor.service.AssociadoService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +30,11 @@ public class UserService {
     RestTemplate restTemplate;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record CpfValidoBean(String status) {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class CpfValidoBean {
+        private String status;
     }
 
     /**

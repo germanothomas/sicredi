@@ -3,17 +3,22 @@ package germano.thomas.sicredienqueteservidor.controller.bean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record VotaBean(
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class VotaBean {
         @NotNull(message = "idAssociado é obrigatório")
-        Long idAssociado,
+        private Long idAssociado;
 
         @NotNull(message = "idItem é obrigatório")
-        Long idItem,
+        private Long idItem;
 
         @NotNull(message = "valor é obrigatório")
         @JsonProperty("valor")
         @Schema(allowableValues = {"true", "false"})
-        Boolean valor
-) {
+        private Boolean valor;
 }

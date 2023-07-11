@@ -120,7 +120,7 @@ public class VotoService {
             throw new IllegalArgumentException(mensagemErro);
         }
 
-        if (resultado.dataHoraContabilizacao() == null) {
+        if (resultado.getDataHoraContabilizacao() == null) {
             String mensagemErro = "Votos do item ainda não foram contabilizados.";
             log.warn("carregaResultado (idItem=" + idItem + "): ", mensagemErro);
 

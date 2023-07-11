@@ -62,7 +62,7 @@ public class EnqueteController {
     )
     @PostMapping("/sessao-votacao/abre")
     public void abreSessaoVotacao(@RequestBody @Valid AbreSessaoVotacaoBean abreSessaoBean) {
-        pautaService.abreSessaoVotacao(abreSessaoBean.pautaId(), abreSessaoBean.duracaoMinutos());
+        pautaService.abreSessaoVotacao(abreSessaoBean.getPautaId(), abreSessaoBean.getDuracaoMinutos());
     }
 
     @Operation(summary = "Vota",
@@ -72,7 +72,7 @@ public class EnqueteController {
     )
     @PostMapping("/sessao-votacao/vota")
     public Long vota(@RequestBody @Valid VotaBean votaBean) {
-        return votoService.vota(votaBean.idAssociado(), votaBean.idItem(), votaBean.valor());
+        return votoService.vota(votaBean.getIdAssociado(), votaBean.getIdItem(), votaBean.getValor());
     }
 
     @Operation(summary = "Contabiliza votos",
