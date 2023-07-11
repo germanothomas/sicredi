@@ -1,5 +1,6 @@
 package germano.thomas.sicredienqueteservidor.service;
 
+import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoItemBean;
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -172,5 +174,47 @@ class VotoServiceTest {
         assertEquals(totalVotosEsperados, itemPersistido.getTotalVotos());
         assertEquals(porcentagemAprovacaoEsperada, itemPersistido.getPorcentagemAprovacao());
         assertNotNull(itemPersistido.getDataHoraContabilizacao());
+    }
+
+    @Test
+    void carregaResultado() {
+        // given
+        Long idItem = 238746L;
+        ResultadoVotacaoItemBean resultadoEsperado = new ResultadoVotacaoItemBean(4L, 25L, LocalDateTime.now());
+        when(itemRepository.findResultado(idItem)).thenReturn(resultadoEsperado);
+
+        // when
+        ResultadoVotacaoItemBean result = service.carregaResultado(idItem);
+
+        // then
+        assertEquals(resultadoEsperado, result);
+    }
+
+    @Test
+    void carregaResultadoItemNaoEncontrado() {
+        // given
+        Long idItem = 238746L;
+        when(itemRepository.findResultado(idItem)).thenReturn(null);
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.carregaResultado(idItem));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("encontrado"));
+    }
+
+    @Test
+    void carregaResultadoItemNaoContabilizado() {
+        // given
+        Long idItem = 238746L;
+        when(itemRepository.findResultado(idItem)).thenReturn(new ResultadoVotacaoItemBean(null, null, null));
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.carregaResultado(idItem));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("contabilizados"));
     }
 }
