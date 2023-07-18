@@ -5,6 +5,7 @@ Criado para avaliação técnica do Sicredi
 
 ## [Unreleased]
 ### Added
+- Endpoint de Contabiliza Votos Pauta
 ### Changed
 ### Deprecated
 ### Removed

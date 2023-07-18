@@ -3,6 +3,7 @@ package germano.thomas.sicredienqueteservidor.service;
 import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoItemBean;
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
+import germano.thomas.sicredienqueteservidor.domain.VotoAgrupadoProjection;
 import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
 import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
 import germano.thomas.sicredienqueteservidor.service.externo.UserService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -75,34 +77,64 @@ public class VotoService {
     }
 
     /**
-     * Contabilizar os votos de um item em uma pauta.
-     * @param idItem id do item a ter seus votos contabilizados.
+     * Contabilizar os votos de uma pauta.
+     * @param idPauta id da pauta a ter os votos de todos os seus itens contabilizados.
      * @return Total de votos contabilizados.
      */
-    public Long contabilizaVotos(Long idItem) {
-        Optional<Item> optionalItem = itemRepository.findById(idItem);
-        if (optionalItem.isEmpty()) {
-            String mensagemErro = "Item não encontrado para contabilização.";
-            log.warn("contabilizaVotos (idItem=" + idItem + "): ", mensagemErro);
+    public long contabilizaVotosPauta(Long idPauta) {
+        boolean existePauta = pautaService.isExistePauta(idPauta);
+        if (!existePauta) {
+            String mensagemErro = "Pauta não encontrada.";
+            log.warn("contabilizaVotosPauta (idPauta=" + idPauta + "): " + mensagemErro);
 
             throw new IllegalArgumentException(mensagemErro);
         }
 
-        long votosPositivos = votoRepository.countVotos(idItem, Boolean.TRUE);
-        long votosNegativos = votoRepository.countVotos(idItem, Boolean.FALSE);
+        List<VotoAgrupadoProjection> votosAgrupados = votoRepository.countVotosPauta(idPauta);
+        final LocalDateTime dataHoraContabilizacao = LocalDateTime.now();
+        long totalVotos = votosAgrupados.stream().mapToLong(votoAgrupado -> {
+            Item item = itemRepository.findById(votoAgrupado.getIdItem()).get();
+
+            return contabilizaVotosItem(item, votoAgrupado.getVotosSim(), votoAgrupado.getVotosNao(), dataHoraContabilizacao);
+        }).sum();
+        log.info("Contabilizados " + totalVotos + " votos entre todos os itens da pauta de id " + idPauta);
+
+        return totalVotos;
+    }
+
+    /**
+     * Contabilizar os votos de um item em uma pauta.
+     * @param idItem id do item a ter seus votos contabilizados.
+     * @return Total de votos contabilizados.
+     */
+    public Long contabilizaVotosItem(Long idItem) {
+        Optional<Item> optionalItem = itemRepository.findById(idItem);
+        if (optionalItem.isEmpty()) {
+            String mensagemErro = "Item não encontrado para contabilização.";
+            log.warn("contabilizaVotos (idItem=" + idItem + "): " + mensagemErro);
+
+            throw new IllegalArgumentException(mensagemErro);
+        }
+
+        long votosSim = votoRepository.countVotosItem(idItem, Boolean.TRUE);
+        long votosNao = votoRepository.countVotosItem(idItem, Boolean.FALSE);
         LocalDateTime dataHoraContabilizacao = LocalDateTime.now();
 
-        Long totalVotos = votosPositivos + votosNegativos;
-        Long porcentagemAprovacao = totalVotos == 0 ? 0 : 100 * votosPositivos / totalVotos;
+        Long totalVotos = contabilizaVotosItem(optionalItem.get(), votosSim, votosNao, dataHoraContabilizacao);
+        log.info("Contabilizados " + totalVotos + " votos do item de id " + idItem);
 
-        Item item = optionalItem.get();
+        return totalVotos;
+    }
+
+    private Long contabilizaVotosItem(Item item, long votosSim, long votosNao, LocalDateTime dataHoraContabilizacao) {
+        long totalVotos = votosSim + votosNao;
+        long porcentagemAprovacao = totalVotos == 0 ? 0 : 100 * votosSim / totalVotos;
+
         item.setTotalVotos(totalVotos);
         item.setPorcentagemAprovacao(porcentagemAprovacao);
         item.setDataHoraContabilizacao(dataHoraContabilizacao);
 
         itemRepository.save(item);
-        log.info("Contabilizados " + totalVotos + " votos do item de id " + idItem);
-
         return totalVotos;
     }
 
@@ -115,14 +147,14 @@ public class VotoService {
         ResultadoVotacaoItemBean resultado = itemRepository.findResultado(idItem);
         if (resultado == null) {
             String mensagemErro = "Item não encontrado para carregar resultado.";
-            log.warn("carregaResultado (idItem=" + idItem + "): ", mensagemErro);
+            log.warn("carregaResultado (idItem=" + idItem + "): " + mensagemErro);
 
             throw new IllegalArgumentException(mensagemErro);
         }
 
         if (resultado.dataHoraContabilizacao() == null) {
             String mensagemErro = "Votos do item ainda não foram contabilizados.";
-            log.warn("carregaResultado (idItem=" + idItem + "): ", mensagemErro);
+            log.warn("carregaResultado (idItem=" + idItem + "): " + mensagemErro);
 
             throw new IllegalArgumentException(mensagemErro);
         }
