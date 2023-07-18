@@ -4,9 +4,12 @@ import germano.thomas.sicredienqueteservidor.controller.bean.ResultadoVotacaoIte
 import germano.thomas.sicredienqueteservidor.domain.Item;
 import germano.thomas.sicredienqueteservidor.domain.Pauta;
 import germano.thomas.sicredienqueteservidor.domain.Voto;
+import germano.thomas.sicredienqueteservidor.domain.VotoAgrupadoProjection;
 import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
 import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
 import germano.thomas.sicredienqueteservidor.service.externo.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +21,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -145,6 +150,92 @@ class VotoServiceTest {
         assertTrue(excecaoEsperada.getMessage().contains("pode votar"));
     }
 
+    @Data
+    @AllArgsConstructor
+    private static class VotoAgrupadoProjectionImpl implements VotoAgrupadoProjection {
+        private Long idItem;
+        private Long votosSim;
+        private Long votosNao;
+    }
+
+    @Test
+    void contabilizaVotosPauta() {
+        // given
+        Long idPauta = 21342536L;
+        when(pautaService.isExistePauta(idPauta)).thenReturn(true);
+
+        Item item1 = criaItem(1L);
+        Item item2 = criaItem(2L);
+        Item item3 = criaItem(3L);
+        Item item4 = criaItem(4L);
+
+        List<VotoAgrupadoProjection> votosAgrupados = new ArrayList<>();
+        votosAgrupados.add(new VotoAgrupadoProjectionImpl(item1.getId(), 3L, 1L));
+        votosAgrupados.add(new VotoAgrupadoProjectionImpl(item2.getId(), 8L, 0L));
+        votosAgrupados.add(new VotoAgrupadoProjectionImpl(item3.getId(), 0L, 9L));
+        votosAgrupados.add(new VotoAgrupadoProjectionImpl(item4.getId(), 0L, 0L));
+        when(votoRepository.countVotosPauta(idPauta)).thenReturn(votosAgrupados);
+
+        // when
+        long result = service.contabilizaVotosPauta(idPauta);
+
+        // then
+        assertEquals(21, result);
+
+        ArgumentCaptor<Item> itemArgumentCaptor = ArgumentCaptor.forClass(Item.class);
+        verify(itemRepository, times(4)).save(itemArgumentCaptor.capture());
+        List<Item> itensPersistidos = itemArgumentCaptor.getAllValues();
+
+        verificaItem(4, 75, itensPersistidos.get(0));
+        verificaItem(8, 100, itensPersistidos.get(1));
+        verificaItem(9, 0, itensPersistidos.get(2));
+        verificaItem(0, 0, itensPersistidos.get(3));
+    }
+
+    private Item criaItem(long idItem) {
+        Item item = new Item();
+        item.setId(idItem);
+        when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
+
+        return item;
+    }
+
+    private void verificaItem(long totalVotosEsperado, long porcentagemAprovacaoEsperada, Item itemPersistido) {
+        assertEquals(totalVotosEsperado, itemPersistido.getTotalVotos());
+        assertEquals(porcentagemAprovacaoEsperada, itemPersistido.getPorcentagemAprovacao());
+        assertNotNull(itemPersistido.getDataHoraContabilizacao());
+    }
+
+    @Test
+    void contabilizaVotosPautaSemVotos() {
+        // given
+        Long idPauta = 21342536L;
+        when(pautaService.isExistePauta(idPauta)).thenReturn(true);
+        List<VotoAgrupadoProjection> votosAgrupados = new ArrayList<>();
+        when(votoRepository.countVotosPauta(idPauta)).thenReturn(votosAgrupados);
+
+        // when
+        long result = service.contabilizaVotosPauta(idPauta);
+
+        // then
+        assertEquals(0, result);
+        verify(itemRepository, never()).save(any());
+    }
+
+    @Test
+    void contabilizaVotosPautaNaoEncontrada() {
+        // given
+        Long idPauta = 21342536L;
+        when(pautaService.isExistePauta(idPauta)).thenReturn(false);
+
+        // when
+        IllegalArgumentException excecaoEsperada = assertThrows(IllegalArgumentException.class, () ->
+                service.contabilizaVotosPauta(idPauta));
+
+        // then
+        assertTrue(excecaoEsperada.getMessage().contains("encontrada"));
+    }
+
     @ParameterizedTest
     @CsvSource({
             "3, 1, 75",
@@ -152,17 +243,17 @@ class VotoServiceTest {
             "0, 9, 0",
             "0, 0, 0",
     })
-    void contabilizaVotos(Long votosSim, Long votosNao, Long porcentagemAprovacaoEsperada) {
+    void contabilizaVotosItem(Long votosSim, Long votosNao, Long porcentagemAprovacaoEsperada) {
         // given
         Long idItem = 252352L;
         Long totalVotosEsperados = votosSim + votosNao;
         Item item = new Item();
-        when(votoRepository.countVotos(idItem, Boolean.TRUE)).thenReturn(votosSim);
-        when(votoRepository.countVotos(idItem, Boolean.FALSE)).thenReturn(votosNao);
+        when(votoRepository.countVotosItem(idItem, Boolean.TRUE)).thenReturn(votosSim);
+        when(votoRepository.countVotosItem(idItem, Boolean.FALSE)).thenReturn(votosNao);
         when(itemRepository.findById(idItem)).thenReturn(Optional.of(item));
 
         // when
-        Long result = service.contabilizaVotos(idItem);
+        Long result = service.contabilizaVotosItem(idItem);
 
         // then
         assertEquals(totalVotosEsperados, result);

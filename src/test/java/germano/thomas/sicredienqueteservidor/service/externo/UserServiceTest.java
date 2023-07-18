@@ -1,11 +1,6 @@
 package germano.thomas.sicredienqueteservidor.service.externo;
 
-import germano.thomas.sicredienqueteservidor.domain.Voto;
-import germano.thomas.sicredienqueteservidor.repository.ItemRepository;
-import germano.thomas.sicredienqueteservidor.repository.VotoRepository;
 import germano.thomas.sicredienqueteservidor.service.AssociadoService;
-import germano.thomas.sicredienqueteservidor.service.PautaService;
-import germano.thomas.sicredienqueteservidor.service.VotoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,15 +8,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.ConnectException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.lenient;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

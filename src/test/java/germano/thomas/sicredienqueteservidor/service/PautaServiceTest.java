@@ -251,4 +251,17 @@ class PautaServiceTest {
         // then
         assertFalse(result);
     }
+
+    @Test
+    void isExistePauta() {
+        // given
+        Long idPauta = 8723645L;
+        when(pautaRepository.existsById(idPauta)).thenReturn(true);
+
+        // when
+        boolean result = service.isExistePauta(idPauta);
+
+        // then
+        assertTrue(result);
+    }
 }

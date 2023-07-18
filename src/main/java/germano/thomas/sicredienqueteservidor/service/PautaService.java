@@ -87,6 +87,13 @@ public class PautaService {
         return sessaoVotacaoInicio.isBefore(agora) && agora.isBefore(sessaoVotacaoFim);
     }
 
+    /**
+     * Retorna se determinada pauta existe.
+     */
+    public boolean isExistePauta(Long idPauta) {
+        return pautaRepository.existsById(idPauta);
+    }
+
     private void escondeResultadoVotacao(Item item) {
         item.setTotalVotos(null);
         item.setPorcentagemAprovacao(null);

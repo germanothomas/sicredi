@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Info(
         title = "API de enquetes Sicredi",
         description = "Controla a utilizacao das enquetes: cadastro de pautas, sessoes de votacao e resultados.",
-        version = "v2.0.0"
+        version = "v2.1.0"
 )
 )
 @RequestMapping(produces = "application/json;charset=UTF-8")
@@ -75,14 +75,25 @@ public class EnqueteController {
         return votoService.vota(votaBean.idAssociado(), votaBean.idItem(), votaBean.valor());
     }
 
-    @Operation(summary = "Contabiliza votos",
+    @Operation(summary = "Contabiliza votos pauta",
+            description = "Contabilizar os votos de todos os itens de uma pauta.",
+            responses = @ApiResponse(description = "Total de votos de todos os itens contabilizados.")
+    )
+    @PostMapping("/pauta/{idPauta}/contabiliza-votos")
+    public Long contabilizaVotosPauta(
+            @Parameter(description = "id da pauta a ter os votos dos seus itens contabilizados.", required = true)
+            @PathVariable Long idPauta) {
+        return votoService.contabilizaVotosPauta(idPauta);
+    }
+
+    @Operation(summary = "Contabiliza votos item",
             description = "Contabilizar os votos de um item em uma pauta.",
             responses = @ApiResponse(description = "Total de votos contabilizados.")
     )
     @PostMapping("/item/{idItem}/contabiliza-votos")
-    public Long contabilizaVotos(
+    public Long contabilizaVotosItem(
             @Parameter(description = "id do item a ter seus votos contabilizados.", required = true) @PathVariable Long idItem) {
-        return votoService.contabilizaVotos(idItem);
+        return votoService.contabilizaVotosItem(idItem);
     }
 
     @Operation(summary = "Carrega resultado",
