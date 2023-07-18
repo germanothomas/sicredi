@@ -5,12 +5,15 @@ Criado para avaliação técnica do Sicredi
 
 ## [Unreleased]
 ### Added
-- Endpoint de Contabiliza Votos Pauta
 ### Changed
 ### Deprecated
 ### Removed
 ### Fixed
 ### Security
+
+## [2.1.0] - 2023-07-18
+### Added
+- Endpoint de Contabiliza Votos Pauta
 
 ## [2.0.0] - 2023-07-11
 ### Added

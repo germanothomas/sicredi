@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>germano.thomas</groupId>
 	<artifactId>sicredi-enquete-servidor</artifactId>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>2.1.0</version>
 	<name>sicredi-enquete-servidor</name>
 	<description>Servidor de enquetes para o Sicredi</description>
 	<properties>

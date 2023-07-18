@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Info(
         title = "API de enquetes Sicredi",
         description = "Controla a utilizacao das enquetes: cadastro de pautas, sessoes de votacao e resultados.",
-        version = "v2.0.0"
+        version = "v2.1.0"
 )
 )
 @RequestMapping(produces = "application/json;charset=UTF-8")
